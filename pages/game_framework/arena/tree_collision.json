@@ -1,0 +1,14 @@
+{
+    "Arena": {
+        "@@self": "Node2D",
+        "Inner": "Sprite",
+        "Outer": "Sprite",
+        "StaticBody2D" : {
+            "@@self" : "StaticBody2D",
+            "UpCollisionShape2D" : "CollisionShape2D",
+            "DownCollisionShape2D" : "CollisionShape2D",
+            "LeftCollisionShape2D" : "CollisionShape2D",
+            "RightCollisionShape2D" : "CollisionShape2D"
+        }
+    }
+}

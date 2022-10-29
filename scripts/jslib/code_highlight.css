@@ -1,0 +1,50 @@
+.code_highlight_container {
+    position: relative;
+    width: inherit;
+    height: inherit;
+    padding: 10px 10px 10px 10px;
+    background-color: #202431;
+    color: #c9cbd0;
+    border: solid #2f3440;
+    font-family: Consolas;
+    overflow-y: auto;
+    overflow-x: auto;
+    white-space:nowrap;
+}
+
+.code_highlight_copy_button{
+    position: relative;
+    float: left;
+    top: 4px;
+    color: #f6f7fb;
+    background-color: #336cf2;
+    padding: 4px 16px 4px 16px;
+    border: none;
+    border-radius: 8px;
+    width: 75px;
+    transition: 0.5s ease-in-out opacity, 0.25s ease-in-out width;
+    overflow: hidden;
+    white-space:nowrap;
+    font-weight: bold;
+}
+
+.code_highlight_copy_button:hover{
+    cursor: pointer;
+}
+
+.code_highlight_title{
+    position: relative;
+    width: inherit;
+    margin: 0 0 0 0;
+    background-color: #202431;
+    color: #c9cbd0;
+    font-weight: bold;
+    overflow-x: hidden;
+
+    padding-right: 15px;
+    padding-left: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}

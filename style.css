@@ -1,0 +1,44 @@
+@font-face {
+    font-family: RHRCN;
+    src: url("ResourceHanRoundedCN-Normal.ttf");
+}
+
+* {
+    --bg-color: rgb(40,44,52);
+    --text-color: rgb(239,239,239);
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: RHRCN;
+}
+
+a{
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+center{
+    text-align: center;
+}
+
+h1, h2, h3, h4, h5, h6{
+    margin: 0 0 0 0;
+    margin-left: 32px;
+}
+
+p{
+    margin: 0 0 0 0;
+    margin-left: 32px;
+    font-size: large;
+}
+
+canvas{
+    margin-left: 32px;
+}
+
+.img{
+    margin: 0 0 0 0;
+    margin-left: 32px;
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <title>undertale同人游戏制作教程</title>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link href="/scripts/jslib/code_highlight.css" rel="stylesheet" type="text/css">
+    <script src="/scripts/jslib/code_highlight.js"></script>
+    <link href="/style.css" rel="stylesheet" type="text/css">
+    <script src="/scripts/jslib/jquery.js"></script>
+</head>
+
+<body>
+    <ul id="table">
+    </ul>
+
+    <script>
+        $.getJSON("pages/config.json", function (data) {
+            let container = document.getElementById("table")
+            spawn(data, container)
+        })
+        function spawn(current, container) {
+            for (var index in current) {
+                let type = typeof (current[index])
+                let li;
+                switch (type) {
+                    case "string":
+                        li = document.createElement("li");
+                        let a = document.createElement("a");
+                        a.innerHTML = index
+                        a.href = "pages/" + current[index]
+                        li.appendChild(a);
+                        container.appendChild(li);
+                        break
+                    case "object":
+                        let ul = document.createElement("ul");
+                        li = document.createElement("li");
+                        li.innerHTML = index
+                        li.appendChild(ul);
+                        container.appendChild(li);
+                        spawn(current[index], ul)
+                        break
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

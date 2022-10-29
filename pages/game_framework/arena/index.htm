@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <title>战斗框</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link href="/scripts/jslib/code_highlight.css" rel="stylesheet" type="text/css">
+    <script src="/scripts/jslib/code_highlight.js"></script>
+    <link href="/style.css" rel="stylesheet" type="text/css">
+    <script src="/scripts/jslib/jquery.js"></script>
+    <script src="/scripts/jslib/json_tree.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+    <style>
+        .code {
+            display: block;
+            position: relative;
+            width: calc(100% - 64px);
+            left: 32px;
+        }
+    </style>
+</head>
+
+<body>
+    <center>
+        <h1>一、战斗框</h1>
+    </center>
+    <br>
+    <p>在ut模板中，战斗框可谓是最简单的部分，在此，我也从它开始。</p>
+    <br>
+    <p>在开始制作之前，我们先大致构想一下战斗框场景节点树的构成。</p>
+    <br><br><br><br>
+    <h2>1. 战斗框的绘制</h2>
+    <br>
+    <canvas class="arena" width="255" height="130"></canvas>
+    <p>如上图，这是一个战斗框。它是黑色的，有一个宽度为5像素的白色边框。</p>
+    <p>但是如果我们这么做的话，后面处理起来可能会比较麻烦。</p>
+    <br><br><br>
+    <p>实际上，我们可以这么想它，</p>
+    <p>请看下面两个图形：</p>
+    <br>
+    <canvas id="inner" width="245px" height="120px"></canvas>
+    <canvas id="outer" width="255px" height="130px"></canvas>
+    <p>看出点什么了吗？</p>
+    <br><br>
+    <p>没错，当我们把它们放在一起时：</p>
+    <canvas class="arena" width="255" height="130"></canvas>
+    <p>就是我们要的战斗框。</p>
+    <br><br><br>
+    <p>因此，我们确定了绘制部分的节点树的内容。</p>
+    <json-tree src="tree_draw.json"></json-tree>
+    <p>其中，Inner就是上图中的黑色矩形，Outer就是白色矩形，</p>
+    <p>它们都是一个Sprite节点，并且Texture为一张1x1大小的白色像素图片。</p>
+    <p>这样，我们就可以通过调整scale属性调整它的大小，例如scale = Vector2(255, 130)就是将大小调整为255px * 130px。</p>
+    <p>由于Texture的图片是纯白的，因此调整modulate就可以直接改变它的颜色。</p>
+    <br><br><br>
+    <p>接下来，让我们来做碰撞部分。</p>
+    <p>为了不让玩家出框，我们需要给他添加碰撞。</p>
+    <p>在此基础教程中，我们不会去做异形框，因此就简单了许多。</p>
+    <img src="collision.png" class="img">
+    <p>红色部分便是我们需要设置的碰撞。</p>
+    <p>由于此物体需要阻挡玩家，因此我们需要一个StaticBody2D。</p>
+    <p>为了实现环绕战斗框作碰撞的效果，最简单的办法是设置四个CollisionShape2D，当然，也可以用多边形碰撞形。</p>
+    <p>现在，我们的节点树应该是这样的</p>
+    <json-tree src="tree_collision.json"></json-tree>
+    <br><br><br>
+    <p>接下来开始写脚本。</p>
+    <br>
+    <p>我们为根节点Arena新建一个脚本Arena.gd</p>
+    <br>
+    <code-highlight class="code" src="Arena1.gd" title="Arena.gd"></code-highlight>
+    <br>
+    <p>先写出一个基本的框架，获取节点，并创建Arena类（在后边识别Arena的时候可能会用到）</p>
+    <br><br><br><br>
+    <p>战斗框需要移动，改变大小，旋转，但是这些都是需要过渡动画的。</p>
+    <p>因此，我们加上几个变量。</p>
+    <br>
+    <code-highlight class="code" src="Arena2.gd" title="Arena.gd"></code-highlight>
+    <br>
+    <p>目前的思路是：</p>
+    <p>给current开头的变量做一个动画，让它通过一些方法不断接近target开头的的对应变量。</p>
+    <p>然后将对应属性给Sprite设置上即可。</p>
+    <br>
+    <p>现在，给出一种方法让current接近target。</p>
+    <br>
+    <h2>Lerp</h2>
+    <p>实现如下，十分简单，gd中就有内置的函数。</p>
+    <code-highlight class="code" src="lerp.gd" title="Lerp"></code-highlight>
+    <p>关键点在于返回的东西，这是lerp缓动的公式：</p>
+    <p><strong>(b - a) * t + b</strong></p>
+    <br>
+    <p>现在给它换一个直观一点的变量名：</p>
+    <p><strong>(to - from) * weight + from</strong></p>
+    <br>
+    <p>还不明白？再改一下：</p>
+    <p><strong>(target - current) * weight + current</strong></p>
+    <br>
+    <p>weight是一个0~1之间的值，它控制着动画的速度（不是时间），越接近0速度越慢。</p>
+    <br>
+    <p>演示动画（动画中weight值的效果与实际可能不符，请以实际效果为准）：</p>
+    <br>
+    <h3>位置：</h3>
+    <canvas id="lerp_position" width="750" height="130"></canvas>
+    <br><br>
+    <h3>大小：</h3>
+    <canvas id="lerp_size" width="750" height="130"></canvas>
+    <br><br>
+    <p>
+        <span>weight:</span>
+        <input type="range" min="0.0" max="1.0" step="0.01" value="0.05" id="weight">
+        <span id="weight_display">0.05</span>
+    </p>
+    <br><br><br><br>
+    <p>有了lerp函数，我们就可以来完善Arena.gd的代码了：</p>
+    <code-highlight class="code" src="Arena3.gd" title="Arena.gd"></code-highlight>
+    <br><br><br><br>
+    <p>接下来是更新碰撞箱的位置，您可以通过打开godot的显示碰撞区域来在游戏中看见碰撞箱。</p>
+    <img src="godot_collision_shape.png" class="img">
+    <p>回过头来看这张图：</p>
+    <img src="collision.png" class="img">
+    <json-tree src="tree_collision.json"></json-tree>
+    <p>让我们来分析一下Up，Down，Left，Right四个节点该如何设置位置、大小。</p>
+    <img src="shape.png" class="img">
+    <p>战斗框长为w，宽为h，每个碰撞箱的宽度都为s，由于此碰撞箱节点也是战斗框的子节点之一，因此，以战斗框中心为原点设置坐标即可。</p>
+    <p>经过简单的推理，不难得出四个碰撞箱大小及坐标：</p>
+    <p>（U为UpCollisionShape2D, D为DownCollisionShape2D，以此类推）</p>
+    <p>（US为U的大小，同理，DS为D的大小……）</p>
+    <br>
+    <p>
+        \begin{equation}\begin{split}
+        &D(0, +({h \over 2} + {s \over 2}))&emsp;DS(w + 2s, 0)\\
+        &U(0, -({h \over 2} + {s \over 2}))&emsp;US(w + 2s, 0)\\
+        &R(+({w \over 2} + {s \over 2}), 0)&emsp;RS(0, h)\\
+        &L(-({w \over 2} + {s \over 2}), 0)&emsp;LS(0, h)\\
+        \end{split}\end{equation}
+    </p>
+    <p>由于gd的父子节点关系会自动处理旋转，因此我们这里不需要用到三角函数了。</p>
+    <p>接下来，让我们把每个CollisionShape的shape属性都设置为一个大小1像素的方形碰撞箱，即\( \overrightarrow  {Extents} = (0.5, 0.5) \)</p>
+    <p>然后，就可以开始写代码了，我们专门安排一个函数来处理。</p>
+    <code-highlight class="code" src="Arena4.gd" title="Arena.gd"></code-highlight>
+    <h1><center><a href="/">完工！</a></center></h1>
+    <script>
+        let canvas_p = document.getElementById("lerp_position");
+        let canvas_s = document.getElementById("lerp_size");
+        let input = document.getElementById("weight");
+        let display = document.getElementById("weight_display");
+
+        let ctx_p = canvas_p.getContext("2d");
+        let ctx_s = canvas_s.getContext("2d");
+
+        const fps = 60.0;
+        const radius = 50.0;
+
+        let delta = 1.0 / fps * 1000.0;
+        let weight = 0.05;
+
+        let current_x = 0.0;
+        let current_size = 0.0;
+
+        input.onchange = function () {
+            weight = input.value;
+            display.textContent = weight;
+        }
+
+        function update_p() {
+            ctx_p.clearRect(0.0, 0.0, canvas_p.clientWidth, canvas_p.clientHeight);
+            ctx_p.fillStyle = "rgb(255, 255, 255)";
+            ctx_p.fillRect(current_x, 0, 155.0, 130.0);
+            ctx_p.fillStyle = "rgb(0, 0, 0)";
+            ctx_p.fillRect(current_x + 5, 5, 145.0, 120.0);
+
+            current_x += (canvas_p.clientWidth - current_x - 155) * weight
+            if (current_x >= canvas_p.clientWidth - 160) {
+                current_x = 0.0
+                setTimeout(update_p, delta * 5.0);
+                return;
+            }
+
+            setTimeout(update_p, delta);
+        }
+
+        function update_s() {
+            ctx_s.clearRect(0.0, 0.0, canvas_s.clientWidth, canvas_s.clientHeight);
+            ctx_s.fillStyle = "rgb(255, 255, 255)";
+            ctx_s.fillRect(0.0, 0, current_size, 130.0);
+            ctx_s.fillStyle = "rgb(0, 0, 0)";
+            ctx_s.fillRect(0.0 + 5, 5, current_size > 0 ? current_size - 10 : 0.0, 120.0);
+
+            current_size += (canvas_s.clientWidth - current_size) * weight;
+            if (current_size >= canvas_s.clientWidth - 10) {
+                current_size = 0.0;
+                setTimeout(update_s, delta * 5.0);
+                return;
+            }
+
+            setTimeout(update_s, delta);
+        }
+
+        setTimeout(update_p, delta);
+        setTimeout(update_s, delta);
+    </script>
+    <script>
+        {
+            let canvas = document.getElementById("inner");
+            let ctx = canvas.getContext("2d");
+            ctx.fillStyle = "rgb(0, 0, 0)";
+            ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+        }
+        {
+            let canvas = document.getElementById("outer");
+            let ctx = canvas.getContext("2d");
+            ctx.fillStyle = "rgb(255, 255, 255)";
+            ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+        }
+    </script>
+    <script>
+        let elements = document.getElementsByClassName("arena");
+        for (let i = 0; i < elements.length; i++) {
+            const canvas = elements[i];
+            let ctx = canvas.getContext("2d");
+            ctx.fillStyle = "rgb(255, 255, 255)";
+            ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+            ctx.fillStyle = "rgb(0, 0, 0)";
+            ctx.fillRect(5, 5, canvas.clientWidth - 10, canvas.clientHeight - 10);
+        }
+    </script>
+    <script>
+        update_element()
+    </script>
+</body>
+
+</html>
