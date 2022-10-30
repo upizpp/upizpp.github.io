@@ -19,6 +19,12 @@
             width: calc(100% - 64px);
             left: 32px;
         }
+
+        #video {
+            margin-left: 32px;
+            width: 800px;
+            height: 450px;
+        }
     </style>
 </head>
 
@@ -26,6 +32,8 @@
     <center>
         <h1>一、战斗框</h1>
     </center>
+    <iframe id="video" src="//player.bilibili.com/player.html?aid=647083131&bvid=BV1me4y147TE&cid=875478124&page=1"
+        scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
     <br>
     <p>在ut模板中，战斗框可谓是最简单的部分，在此，我也从它开始。</p>
     <br>
@@ -62,7 +70,7 @@
     <p>红色部分便是我们需要设置的碰撞。</p>
     <p>由于此物体需要阻挡玩家，因此我们需要一个StaticBody2D。</p>
     <p>为了实现环绕战斗框作碰撞的效果，最简单的办法是设置四个CollisionShape2D，当然，也可以用多边形碰撞形。</p>
-    <p>现在，我们的节点树应该是这样的</p>
+    <p>现在，我们的节点树应该是这样的（注意，Inner和Outer节点的顺序不能反！）</p>
     <json-tree src="tree_collision.json"></json-tree>
     <br><br><br>
     <p>接下来开始写脚本。</p>
@@ -136,10 +144,12 @@
         \end{split}\end{equation}
     </p>
     <p>由于gd的父子节点关系会自动处理旋转，因此我们这里不需要用到三角函数了。</p>
-    <p>接下来，让我们把每个CollisionShape的shape属性都设置为一个大小1像素的方形碰撞箱，即\( \overrightarrow  {Extents} = (0.5, 0.5) \)</p>
+    <p>接下来，让我们把每个CollisionShape的shape属性都设置为一个大小1像素的方形碰撞箱，即\( \overrightarrow {Extents} = (0.5, 0.5) \)</p>
     <p>然后，就可以开始写代码了，我们专门安排一个函数来处理。</p>
     <code-highlight class="code" src="Arena4.gd" title="Arena.gd"></code-highlight>
-    <h1><center><a href="/">完工！</a></center></h1>
+    <h1>
+        <center><a href="/">完工！</a></center>
+    </h1>
     <script>
         let canvas_p = document.getElementById("lerp_position");
         let canvas_s = document.getElementById("lerp_size");

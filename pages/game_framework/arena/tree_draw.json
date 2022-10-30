@@ -1,7 +1,7 @@
 {
     "Arena": {
         "@@self": "Node2D",
-        "Inner": "Sprite",
-        "Outer": "Sprite"
+        "Outer": "Sprite",
+        "Inner": "Sprite"
     }
 }
