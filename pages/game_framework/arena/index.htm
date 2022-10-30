@@ -70,7 +70,7 @@
     <p>红色部分便是我们需要设置的碰撞。</p>
     <p>由于此物体需要阻挡玩家，因此我们需要一个StaticBody2D。</p>
     <p>为了实现环绕战斗框作碰撞的效果，最简单的办法是设置四个CollisionShape2D，当然，也可以用多边形碰撞形。</p>
-    <p>现在，我们的节点树应该是这样的（注意，Inner和Outer节点的顺序不能反！）</p>
+    <p>现在，我们的节点树应该是这样的（注意，Inner和Outer节点的顺序不能反！一定要让Inner在Outer上方绘制，如果出现没有黑色部分就是这个问题，交换一下就好了）</p>
     <json-tree src="tree_collision.json"></json-tree>
     <br><br><br>
     <p>接下来开始写脚本。</p>
