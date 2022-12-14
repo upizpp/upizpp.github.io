@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <title>教程框架</title>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link href="/scripts/jslib/code_highlight.css" rel="stylesheet" type="text/css">
+    <script src="/scripts/jslib/code_highlight.js"></script>
+    <link href="/style.css" rel="stylesheet" type="text/css">
+    <script src="/scripts/jslib/jquery.js"></script>
+    <script src="/scripts/jslib/json_tree.js"></script>
+</head>
+
+<body>
+    <style>
+        pre {
+            position: relative;
+            left: 32px;
+        }
+    </style>
+    <center>
+        <h1>打字机</h1>
+    </center>
+    <p>这当然不是现实中的打字机，这里的打字机指的是一种虚拟的文本动画。</p>
+    <p id="typewriter_demo">&nbsp;</p>
+    <p>简单的实现并不难，但是想要再加一些功能就比较麻烦了，比如说停顿功能，换表情功能等。</p>
+    <p>关于简单的打字机实现，可以参考一下<a href="https://www.bilibili.com/video/BV1y64y127n5" style="text-decoration: underline;"
+            target="_blank">这个视频</a>。</p>
+    <br>
+    <p>这里我不会讲如何制作打字机。</p>
+    <p>我已经将打字机需要的功能封装成了插件：</p>
+    <p><a href="https://gitee.com/upizpp/godot-animated-text/repository/archive/master.zip"
+            style="text-decoration: underline;" target="_blank">点击此处下载</a></p>
+    <p>将压缩包中的addons丢到我们项目的文件夹里，然后在编辑器中启用插件即可。</p>
+    <p><img src="addon_enable.png"></p>
+    <p>我们新建一个Test场景来测试，新建一个AnimatedText节点。</p>
+    <json-tree src="tree1.json"></json-tree>
+    <p>新建一个Dialog资源，拖到Dialog编辑器打开。</p>
+    <p><img src="create_dialog.png"></p>
+    <p><img src="dialog_editor.png" style="width: calc(100vw - 96px);"></p>
+    <br>
+    <div id="addon_introduction">
+        <center>
+            <h1>插件介绍</h1>
+            <p style="font-size: 1em;">（注意：教程中出现的注释只是为了方便教学，实际上这个插件并不支持注释。）</p>
+        </center>
+        <p>首先，要了解几个概念：</p>
+        <br>
+        <div id="part">
+            <p><strong>Part（部分）：</strong></p>
+            <p>一个dialog文件是由很多部分组成的，每个部分都有其对应的功能。</p>
+            <p>部分的写法：</p>
+            <pre># %Partname%
+%Part content%</pre>
+            <p>Part content可以是一行，也可以是很多行。</p>
+            <br>
+            <p><strong>以下是所有的部分：</strong></p>
+            <strong>
+                <ul>
+                    <li>
+                        <a href="#arguments">Arguments</a>
+                    </li>
+                    <li>
+                        <a href="#variants">Variants</a>
+                    </li>
+                    <li>
+                        <a href="#effects">Effects</a>
+                    </li>
+                    <li>
+                        <a href="#functions">Functions</a>
+                    </li>
+                    <li>
+                        <a href="#font_effects">Font Effects</a>
+                    </li>
+                    <li>
+                        <a href="#contents">Contents</a>
+                    </li>
+                    <li>
+                        <a href="#import">Import</a>
+                    </li>
+                </ul>
+            </strong>
+        </div>
+        <br><br>
+        <div id="arguments">
+            <h2>Arguments（参数）：</h2>
+            <p>Arguments，顾名思义，但是也有一些特殊，因为它既像是常量又像是变量。</p>
+            <p>如果说它是常量，它又可以在文件中改变，例如，在第1行定义了参数a=5，在第25行又定义了一次使a=10，那么在行1~24中a=5，在行25~文件末a=10。</p>
+            <p>如果说它是变量，它又是在编译过程中确定的，因此，编译为CompiledDialog之后它就不能改变了。</p>
+            <p>参数的定义方法：</p>
+            <pre>%argname% = %argvalue%;</pre>
+            <p>举个例子，我们要定义如下参数：</p>
+            <ul>
+                <li>a = 5</li>
+                <li>b = 10</li>
+                <li>c = "Hello world!"</li>
+            </ul>
+            <p>那么，用Arguments的写法就是：</p>
+            <pre># Arguments
+a = 5;
+b = 10;
+c = "Hello world!";</pre>
+        </div>
+        <br><br>
+        <div id="variants">
+            <h2>Variants（变量）：</h2>
+            <p>此变量非彼变量，它并不能定义变量，它是用于在文本对话中插入GDScript中的变量。</p>
+            <p>并且，这个变量也不止可以是变量，也可以是函数的返回值。</p>
+            <p>变量的定义方法：</p>
+            <pre>%variants_name = {
+    from: %node_path%;
+    default: %default_value%;
+};;</pre>
+            <p>variants_name是变量名，node_path是要获取变量的节点的NodePath，default_value是当获取变量失败时默认插入的值。</p>
+            <p>这里的变量名就是node_path获取的节点要插入的变量名。</p>
+            <p>例如：</p>
+            <pre># Variants
+time = {
+    from: "/root/Node2D";
+    default: 0;
+};;
+test = {
+    from: path; // path是一个提前定义好的argument。
+    default: 0;
+};;</pre>
+        </div>
+        <br><br>
+        <div id="functions">
+            <h2>Functions（函数）：</h2>
+            <p>这可以帮助你在文本进行的过程中调用函数。</p>
+            <p>函数的两种定义方法：</p>
+            <pre>%function_name% = %path%</pre>
+            <p>function_name是被调用的函数名，path是要调用的节点的NodePath。</p>
+            <pre>%function_name% = {
+    (rename: %rename%),
+    from: %path%,
+    default_args: %args%
+}</pre>
+            <p>function_name是被调用的函数名，path是要调用的节点的NodePath，args是默认调用的参数，rename被括号括起，是一个可选参数，如果存在rename，那么将会以rename作为调用的函数名而不是function_name。</p>
+            <p>例如：</p>
+            <pre># Functions
+play_music = "root/Node2D";;
+print = {
+    rename: "print_";
+    from: "root/Node2D";
+    default_args: ["none"];
+};;</pre>
+        </div>
+        <br><br>
+        <div id="effects">
+            <h2>Effects（效果）：</h2>
+            <p>这个效果能够设置AnimatedText节点的属性。</p>
+            <p>效果的定义方法</p>
+            <pre>%effect_name% = {
+%argname%: %argvalue%;
+};;</pre>
+            <p>这里的effect_name是效果名，argname是要设置的参数名，argvalue是参数的值，这里的参数可以是多个值。</p>
+            <p>如果要设置一些特殊类型的参数，例如spacing（Vector2类型），可以用如下方法表达：</p>
+            <pre>spacing-x: 0.0;
+spacing-y: 0.0;</pre>
+        </div>
+        <br><br>
+        <div id="font_effects">
+            <h2>Font Effects（字体效果）：</h2>
+            <p>字体效果是帮助effect属性使用的。</p>
+            <p>字体效果的定义方法：</p>
+            <pre># %effect_name%
+func action(ch, parent):
+    %code%
+</pre>
+            <p>effect_name是字体效果名，code是gdscript代码，是action函数的内容。</p>
+            <p>例如：</p>
+            <code-highlight src="font_effect.gd" title="" style="position: relative; left: 32px;"></code-highlight>
+            <p>（效果参数current_fe代表当前字体的字体效果，fe_args代表要传入的参数。）</p>
+        </div>
+        <br><br>
+        <div id="contents">
+            <h2>Contents（内容）：</h2>
+            <p>内容就是AnimatedText所打印的内容。</p>
+            <p>内容的定义方法为：</p>
+            <pre># %locale%
+%content</pre>
+            <p>locale为<a href="https://docs.godotengine.org/zh_CN/stable/tutorials/i18n/locales.html">Unix 标准区域设置字符串</a>，它代表content对应的语言，content就是要打印的内容。</p>
+            <br>
+            <strong><p>插入功能：</p></strong>
+            <p>其他所有的Part在没有插入功能的情况下都无法运行，可以说，这是最重要的一环了。</p>
+            <p>以下几种方式：</p>
+            <ul style="font-family: Consolas;">
+                <li>(%function_name%)</li>
+                <li>[%variant_name%]</li>
+                <li>{%effect_name%}</li>
+            </ul>
+            <p>()代表插入函数（对应Functions部分），它的写法如下：</p>
+            <pre>(%function_name%(%args%))</pre>
+            <p>function_name是函数名，args是调用函数的参数。</p>
+            <br><br>
+            <p>[]代表插入变量（对应Variants部分），它的写法如下：</p>
+            <pre>[%variants_name%]</pre>
+            <p>它能在此处插入Variants部分规定的变量。</p>
+            <br><br>
+            <p>{}代表调用效果（对应Effects部分），它的写法如下：</p>
+            <pre>{%effect_name%}</pre>
+            <p>它能在此处调用Effects部分规定的效果。</p>
+            <br><br>
+            <p>例如：</p>
+            <pre># zh_CN
+文本测试，这里将插入当前时间：[time]。
+当打字机到这的时候，{slow}打字速度会很慢，字符间隔也会很大。
+{back}到这里，会恢复正常，
+当进行到此处，(play_music())将会调用一个播放音乐的函数。
+这里，(print("Hello world!"))会打印一些内容。;;
+翻页测试！;;
+再翻一页！
+
+# en
+Text test, the current time will be inserted here: [time].
+When the typewriter arrives here, the {slow} typing speed will be very slow and the character spacing will be very large.
+{back} Here, it will return to normal,
+At this point, (play_music()) will call a function to play music.
+Here, (print ("Hello world!") Some content will be printed.;;
+Flipping test!;;
+Turn another page!</pre>
+        </div>
+        <br><br>
+        <div id="calc_string">
+            <h2>Calc String（计算字符串）：</h2>
+            <p>计算字符串是一种能计算表达式的字符串，它可以出现在除了FontEffects之外的任何部分。</p>
+            <p>它的写法如下所示：</p>
+            <pre>"calc %expression%"</pre>
+            <p>expression中可以包含arguments，可以使用一些godot的常量比如PI，TAU，同样地，也可以使用一些函数比如sin，cos，tan，理论上只要<a
+                    href="https://docs.godotengine.org/zh_CN/stable/classes/class_%40gdscript.html">@GDScript</a>中有的都可以使用。
+            </p>
+            <p>例如：</p>
+            <pre># Arguments
+a = "calc PI"; // 3.1415926...
+b =  "calc sin(a / 2.0)"; // 1.0
+c = "calc a + b"; // 4.1415926...</pre>
+        </div>
+        <br><br>
+        <div id="color">
+            <h2>Color（颜色）：</h2>
+            <p>它用于在赋值时表示颜色</p>
+            <p>它的写法如下所示：</p>
+            <pre>%color%</pre>
+            <p>color是一个HTML 十六进制颜色记号。</p>
+            <p>例如：</p>
+            <pre>#Effects
+demo = {
+    color: ff0000;
+};;</pre>
+        </div>
+        <br><br>
+        <div id="default">
+            <h2>Default（默认）：</h2>
+            <p>默认，就是指默认参数。</p>
+            <p>它的写法如下所示：</p>
+            <pre>default</pre>
+            <p>它可以用在Effects部分。</p>
+            <p>它是一个常量，代表其前面参数的默认值。</p>
+            <p>例如：</p>
+            <pre># Effects
+demo = {
+    interval: default;
+};;</pre>
+            <p>它将interval设置为了它的默认值（0.1）。</p>
+        </div>
+        <br><br>
+        <p>在这些全部完成后，点击编译即可。</p>
+        <img src="compile.png" style="position: relative; left: 32px; width: calc(100vw - 96px);">
+        <br><br><br>
+        <p>示例：</p>
+        <code-highlight src="demo.dlg" style="position: relative; left: 32px;"></code-highlight>
+    </div>
+    <p>将AnimatedText的dialog属性设置为编译好的dlgx文件，打开autoplay，运行场景即可看到效果。</p>
+    <br><br>
+    <h3>另一种运行方式：</h3>
+    <img src="play.png" style="position: relative; left: 32px; width: calc(100vw - 96px);">
+    <script>
+        let current = 0;
+        let d = 1;
+        let content = "比如说这样。";
+        let demo = document.getElementById("typewriter_demo");
+        function update() {
+            current += 1 * d;
+            if (current > content.length || current < 0) {
+                d *= -1;
+            }
+            demo.innerHTML = current > 0 ? content.substr(0, current) : "&nbsp;";
+            setTimeout(update, 200);
+        }
+        setTimeout(update, 200);
+        update_element()
+    </script>
+</body>
+
+</html>

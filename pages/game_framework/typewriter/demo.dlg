@@ -1,0 +1,58 @@
+# Arguments
+test_scene = "/root/Node2D";
+
+# Effects
+slow = {
+	interval: 0.2;
+	spacing-x: 15.0;
+};;
+back = {
+	interval: default;
+	spacing-x: default;
+};;
+
+# Variants
+time = {
+	from: test_scene;
+	default: 0;
+};;
+
+# Functions
+play_music = test_scene;;
+print = {
+	rename: "reprint";
+	from: test_scene;
+	default_args: ["none"];
+};;
+
+# xshake
+func action(ch, _parent):
+	ch.position.x = ch.calipos.x + sin(deg2rad(ch.frame)) * 10.0
+
+# yshake
+func action(ch, _parent):
+	ch.position.y = ch.calipos.y + sin(deg2rad(ch.frame)) * 10.0
+
+# colorful
+func action(ch, _parent, speed := 1.0):
+	if ch.frame == 0:
+		ch.modulate = Color.red
+	ch.modulate.h += speed / 370.0
+
+# zh_CN
+文本测试，这里将插入当前时间：[time]。
+当打字机到这的时候，{slow}打字速度会很慢，字符间隔也会很大。
+{back}到这里，会恢复正常，
+当进行到此处，(play_music())将会调用一个播放音乐的函数。
+这里，(print("Hello world!"))会打印一些内容。;;
+翻页测试！;;
+再翻一页！
+
+# en
+Text test, the current time will be inserted here: [time].
+When the typewriter arrives here, the {slow} typing speed will be very slow and the character spacing will be very large.
+{back} Here, it will return to normal,
+At this point, (play_music()) will call a function to play music.
+Here, (print ("Hello world!") Some content will be printed.;;
+Flipping test!;;
+Turn another page!

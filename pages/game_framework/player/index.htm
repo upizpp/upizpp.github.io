@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <title>教程框架</title>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link href="/scripts/jslib/code_highlight.css" rel="stylesheet" type="text/css">
+    <script src="/scripts/jslib/code_highlight.js"></script>
+    <link href="/style.css" rel="stylesheet" type="text/css">
+    <script src="/scripts/jslib/jquery.js"></script>
+    <script src="/scripts/jslib/json_tree.js"></script>
+    <style>
+        #heart{
+            position: relative;
+            width: 128px;
+            height: 128px;
+            image-rendering: pixelated;
+            left: 32px; 
+            top: 8px;
+        }
+
+        code-highlight {
+            position: relative;
+            left: 32px;
+        }
+
+        table{
+            position: relative;
+            left: 32px;
+        }
+
+        th{
+            padding: 4px 8px 4px 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <a id="video_link" href="javascript:void(0)">暂无视频</a>
+    <center>
+        <h1>二、玩家</h1>
+    </center>
+    <p>接下来，到了做玩家（Player）的部分。</p>
+    <p>玩家以一颗心形物体的形式展现在游戏中，这颗心是可以随意变色的，所以我们准备的图片应是白色的，在游戏中就可以通过Modulate属性变色。</p>
+    <img id="heart" src="heart.png">
+    <p>现在，Player的节点树应当是这样的：</p>
+    <json-tree src="tree1.json"></json-tree>
+    <p>将HeartSprite的texture的属性设置为事先准备好的图片，然后为CollisionShape2D（这里的碰撞形是指玩家碰撞Arena的碰撞形，而不是判定伤害的碰撞形）创建一个新的shape，将它的大小设置为何Player的贴图大小一样。</p>
+    <p>接下来，就可以为它写移动的代码了。</p>
+    <code-highlight src="Player1.gd" title="Player.gd"></code-highlight>
+    <p>关键点就是这里：</p>
+    <code-highlight src="Player2.gd" title="Player.gd"></code-highlight>
+    <p>Input.get_axis需要传入两个参数，negative_action和positive_action</p>
+    <p>它相当于Input.get_action_strength(positive_action)-Input.get_action_strength(negative_action)。</p>
+    <p>Input.get_action_strength(action)：它会返回action按键按下的力度，</p>
+    <p>我们只考虑键盘操作的话，action没被按下时它返回0，action按下时就返回1。</p>
+    <br>
+    <p>现在我们回到Input.get_axis，</p>
+    <p>positive_action简写为p，nagative_action简写为n，情况如下表：</p>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>p</th>
+                <th>n</th>
+                <th>p - n</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>0</th>
+                <th>0</th>
+                <th>0</th>
+            </tr>
+            <tr>
+                <th>1</th>
+                <th>0</th>
+                <th>1</th>
+            </tr>
+            <tr>
+                <th>0</th>
+                <th>1</th>
+                <th>-1</th>
+            </tr>
+            <tr>
+                <th>1</th>
+                <th>1</th>
+                <th>0</th>
+            </tr>
+        </tbody>
+    </table>
+    <p>可以看到，这个返回值刚好是我们要的方向，我们只需要用速度乘上这个方向即可得到我们想要的velocity。</p>
+    <p>这里的input_vector即是获取了左右，上下两组朝向的方向。</p>
+    <script>
+        update_element()
+    </script>
+</body>
+
+</html>

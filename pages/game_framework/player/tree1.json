@@ -1,0 +1,7 @@
+{
+    "Player": {
+        "@@self": "KinematicBody2D",
+        "CollisionShape2D": "CollisionShape2D",
+        "HeartSprite": "Sprite"
+    }
+}
