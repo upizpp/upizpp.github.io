@@ -8,10 +8,39 @@
     --text-color: rgb(239,239,239);
 }
 
+#video_link{
+    text-decoration: underline;
+    position: sticky;
+    text-align: center;
+    height: auto;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    padding: 8px 8px 8px 8px;
+    border-radius: 8px;
+    opacity: 0.1;
+    background-color: var(--bg-color);
+    transition: opacity ease-in-out 0.1s;
+}
+
+#video_link:hover{
+    opacity: 0.75;
+}
+
+pre {
+    font-family: Consolas;
+    font-size: 1.25em;
+}
+
 body {
+    left: 0;
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: RHRCN;
+}
+
+html {
+    left: 0;
 }
 
 a{
