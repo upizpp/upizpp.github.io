@@ -1,5 +1,8 @@
 {
     "游戏框架搭建": {
-        "战斗框": "game_framework/arena/index.htm"
+        "项目配置": "game_framework/config/index.htm",
+        "战斗框（Arena）": "game_framework/arena/index.htm",
+        "玩家（Player）": "game_framework/player/index.htm",
+        "打字机（Typewriter)": "game_framework/typewriter/index.htm"
     }
 }
